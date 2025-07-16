@@ -1,0 +1,2 @@
+(library
+ (name manbo_compiler))
