@@ -1,2 +1,4 @@
 (library
- (name manbo_compiler))
+ (name manbo_compiler)
+ (modules ast)
+)
