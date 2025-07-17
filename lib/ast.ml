@@ -50,3 +50,6 @@ and statement =
       condition: expr;
       statements: statement list;
     }
+
+(* 整个程序 *)
+type prog = statement list
