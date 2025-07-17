@@ -4,13 +4,13 @@ type keyword =
 
 (* 一元运算符 *)
 type unaryop =
-  Plus | Minus
+  Plus | Minus | LogicalNot
 
 (* 二元运算符 *)
 and binop =
   Add | Sub | Mul | Div | Mod (* 算术运算符 *)
   | Less | Le | Equal | Ge | Greater | NotEq (* 比较运算符 *)
-  | LogicalAnd | LogicalOr | LogicalNot (* 逻辑运算符 *)
+  | LogicalAnd | LogicalOr (* 逻辑运算符 *)
   | Assign (* 赋值运算符 *)
 
 (* 表达式 *)
@@ -18,7 +18,7 @@ type expr =
   Unit
   | Number of float
   | String of string
-  | Identifier
+  | Identifier of string
   | UnaryExpr of unaryop * expr
   | BinExpr of expr * binop * expr
   | FnExpr of {
@@ -37,7 +37,8 @@ type expr =
 
 (* 类型注解 *)
 and type_annotation =
-  Unit | Number | String
+  Unit
+  | Type of string
 
 (* 语句 *)
 and statement =

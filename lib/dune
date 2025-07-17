@@ -1,4 +1,8 @@
+(ocamllex lexer)
+(menhir
+ (modules parser))
+
 (library
  (name manbo_compiler)
- (modules ast)
+ (modules lexer parser ast)
 )
