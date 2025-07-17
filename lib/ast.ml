@@ -22,7 +22,7 @@ type expr =
   | UnaryExpr of unaryop * expr
   | BinExpr of expr * binop * expr
   | FnExpr of {
-      arguments: (expr * type_annotation) list;
+      params: (expr * type_annotation) list;
       return: type_annotation;
       statements: statement list;
       tail_expr: expr;
@@ -52,4 +52,4 @@ and statement =
     }
 
 (* 整个程序 *)
-type prog = statement list
+type prog = Prog of statement list
