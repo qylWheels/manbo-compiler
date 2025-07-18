@@ -82,3 +82,5 @@ rule token = parse
 
   (* 标识符、类型 *)
   | identifier as id { ID id }
+
+  | eof { EOF }

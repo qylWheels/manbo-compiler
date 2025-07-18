@@ -63,6 +63,8 @@
 %right LOGICAL_NOT
 %nonassoc UMINUS (* 负号 *)
 
+%token EOF
+
 %start <Ast.prog> prog
 
 %%
