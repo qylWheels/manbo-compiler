@@ -1,10 +1,10 @@
 (* 关键字 *)
 type keyword =
-  Var | Const | Fn | If | While
+  Var | Const | Fn | If | While [@@deriving show]
 
 (* 一元运算符 *)
 type unaryop =
-  Plus | Minus | LogicalNot
+  Plus | Minus | LogicalNot [@@deriving show]
 
 (* 二元运算符 *)
 and binop =
@@ -12,6 +12,7 @@ and binop =
   | Less | Le | Equal | Ge | Greater | NotEq (* 比较运算符 *)
   | LogicalAnd | LogicalOr (* 逻辑运算符 *)
   | Assign (* 赋值运算符 *)
+  [@@deriving show]
 
 (* 表达式 *)
 type expr =
@@ -34,11 +35,13 @@ type expr =
       else_branch: statement list;
       else_tail_expr: expr;
     }
+  [@@deriving show]
 
 (* 类型注解 *)
 and type_annotation =
   Unit
   | Type of string
+  [@@derviing show]
 
 (* 语句 *)
 and statement =
@@ -51,6 +54,7 @@ and statement =
       condition: expr;
       statements: statement list;
     }
+  [@@deriving show]
 
 (* 整个程序 *)
-type prog = Prog of statement list
+type prog = Prog of statement list [@@deriving show]
