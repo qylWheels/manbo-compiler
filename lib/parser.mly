@@ -130,6 +130,15 @@ expression:
 	| e1 = expression; LOGICAL_AND; e2 = expression { BinExpr (e1, LogicalAnd, e2) }
 	| e1 = expression; LOGICAL_OR; e2 = expression { BinExpr (e1, LogicalOr, e2) }
 
+	(* 函数调用表达式 *)
+	| id = ident; LPAREN; args = option(call_args); RPAREN {
+			CallExpr (id, Option.value args ~default:[])
+		}
+
+call_args:
+	| e = expression; option(COMMA) { [e] }
+	| first = expression; COMMA; rest = call_args { first :: rest }
+
 qualifier:
 	| KEYWORD_VAR { `Var }
 	| KEYWORD_CONST { `Const }

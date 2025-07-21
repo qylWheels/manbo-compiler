@@ -32,6 +32,7 @@ type expr =
   | Identifier of identifier
   | UnaryExpr of unaryop * expr
   | BinExpr of expr * binop * expr
+  | CallExpr of identifier * expr list
 
   [@@deriving show]
 
