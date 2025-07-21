@@ -38,8 +38,12 @@ type expr =
 
 (* 语句 *)
 and statement =
-  AssignStmt of {
+  DefStmt of {
     qualifier: [`Var | `Const];
+    lhs: identifier;
+    rhs: expr;
+  }
+  | AssignStmt of {
     lhs: identifier;
     rhs: expr;
   }

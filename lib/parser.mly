@@ -72,7 +72,10 @@ statements:
 
 statement:
 	| q = qualifier; lhs = ident; EQUAL; rhs = expression; SEMICOLON {
-			AssignStmt { qualifier = q; lhs; rhs }
+			DefStmt { qualifier = q; lhs; rhs }
+		}
+	| lhs = ident; EQUAL; rhs = expression; SEMICOLON {
+			AssignStmt { lhs; rhs }
 		}
 	| KEYWORD_WHILE; cond = expression; LBRACE; stmts = statements; RBRACE {
 			WhileStmt { condition = cond; statements = stmts }
