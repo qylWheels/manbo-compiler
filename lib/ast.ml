@@ -1,10 +1,10 @@
 (* 关键字 *)
 type keyword =
-  Var | Const | Fn | If | While [@@deriving show]
+  Var | Const | Fn | Return | If | Else | While [@@deriving show]
 
 (* 一元运算符 *)
 type unaryop =
-  Plus | Minus | LogicalNot [@@deriving show]
+  Minus | LogicalNot [@@deriving show]
 
 (* 二元运算符 *)
 and binop =
@@ -14,45 +14,48 @@ and binop =
   | Assign (* 赋值运算符 *)
   [@@deriving show]
 
-(* 表达式 *)
-type expr =
-  Unit
-  | Number of float
-  | String of string
-  | Identifier of string
-  | UnaryExpr of unaryop * expr
-  | BinExpr of expr * binop * expr
-  | FnExpr of {
-      params: (expr * type_annotation) list;
-      return: type_annotation;
-      statements: statement list;
-      tail_expr: expr;
-    }
-  | IfExpr of {
-      guard: expr;
-      then_branch: statement list;
-      then_tail_expr: expr;
-      else_branch: statement list;
-      else_tail_expr: expr;
-    }
-  [@@deriving show]
+(* 标识符 *)
+type identifier = Identifier of string [@@deriving show]
 
-(* 类型注解 *)
-and type_annotation =
+(* 类型 *)
+and typ =
   Unit
   | Type of string
   [@@derviing show]
+
+(* 表达式 *)
+type expr =
+  Unit
+  | Integer of int
+  | Float of float
+  | String of string
+  | Identifier of identifier
+  | UnaryExpr of unaryop * expr
+  | BinExpr of expr * binop * expr
+
+  [@@deriving show]
 
 (* 语句 *)
 and statement =
   AssignStmt of {
     qualifier: [`Var | `Const];
-    lhs: expr;
+    lhs: identifier;
     rhs: expr;
   }
   | WhileStmt of {
       condition: expr;
       statements: statement list;
+    }
+  | FnStmt of {
+      ident: identifier;
+      params: (identifier * typ) list;
+      return: typ;
+      statements: statement list;
+    }
+  | IfStmt of {
+      guard: expr;
+      then_branch: statement list;
+      else_branch: statement list;
     }
   [@@deriving show]
 

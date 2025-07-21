@@ -7,14 +7,11 @@
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 
-(* 一元运算符 *)
-let plus = '+'
-let minus = '-'
-
 (* 基本元素 *)
-let num_literal = (plus | minus)? digit+ ('.' digit+)?
-let identifier = (alpha | '_') (alpha | digit | '_')*
-let string_char = [^ '"' '\\' '\n']
+let word = (alpha | '_') (alpha | digit | '_')*
+let int_literal = '-'? digit+
+let float_literal = '-'? digit+ ('.' digit+)?
+let str_literal_char = [^ '"' '\\' '\n']
 
 rule token = parse
   (* 跳过空白字符 *)
@@ -24,63 +21,48 @@ rule token = parse
   | "var" { KEYWORD_VAR }
   | "const" { KEYWORD_CONST }
   | "fn" { KEYWORD_FN }
+  | "return" { KEYWORD_RETURN }
   | "if" { KEYWORD_IF }
   | "else" { KEYWORD_ELSE }
   | "while" { KEYWORD_WHILE }
 
-  (* 元组字面量 *)
-  | "()" { UNIT_LITERAL }
+  (* 字面量 *)
+  | int_literal as i { INT_LITERAL (int_of_string i) }
+  | float_literal as f { FLOAT_LITERAL (float_of_string f) }
+  | '"' (str_literal_char* as s) '"' { STRING_LITERAL s }
 
-  (* 数字字面量 *)
-  | num_literal as n { NUM_LITERAL (float_of_string n) }
-
-  (* 字符串字面量 *)
-  | '"' (string_char* as s) '"' { STRING_LITERAL s }
-
-  (* 一元运算符、算数运算符 *)
-  | '+' { ADD }
-  | '-' { SUB }
-  | '*' { MUL }
-  | '/' { DIV }
-  | '%' { MOD }
-
-  (* 比较运算符 *)
-  | '<' { LESS }
+  (* 多字符符号 *)
   | "<=" { LE }
-  | "==" { EQUAL }
+  | "==" { EQ }
   | ">=" { GE }
-  | '>' { GREATER }
-  | "!=" { NOT_EQ }
-
-  (* 逻辑运算符 *)
+  | "!=" { NEQ }
   | "&&" { LOGICAL_AND }
   | "||" { LOGICAL_OR }
-  | "!" { LOGICAL_NOT }
 
-  (* 赋值运算符 *)
-  | '=' { ASSIGN }
-
-  (* 括号 *)
+  (* 单字符符号 *)
+  | '+' { PLUS }
+  | '-' { MINUS }
+  | '*' { MUL }
+  | '/' { DIV }
+  | '%' { PERCENT }
+  | "!" { EXCLAIMATION }
+  | '=' { EQUAL }
+  | ';' { SEMICOLON }
+  | ':' { COLON }
+  | ',' { COMMA }
   | '(' { LPAREN }
   | ')' { RPAREN }
   | '[' { LBRACKET }
   | ']' { RBRACKET }
   | '{' { LBRACE }
   | '}' { RBRACE }
+  | '<' { L_ANGLE_BRACKET }
+  | '>' { R_ANGLE_BRACKET }
 
-  (* 分号 *)
-  | ';' { SEMICOLON }
-
-  (* 冒号 *)
-  | ':' { COLON }
-
-  (* 逗号 *)
-  | ',' { COMMA }
-
-  (* 单行注释 *)
+  (* 单行注释，词法分析的时候直接忽略即可 *)
   | "//" [^ '\n']* { token lexbuf }
 
   (* 标识符、类型 *)
-  | identifier as id { ID id }
+  | word as w { WORD w }
 
   | eof { EOF }
