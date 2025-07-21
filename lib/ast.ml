@@ -53,6 +53,7 @@ and statement =
       return: typ;
       statements: statement list;
     }
+  | RetStmt of expr
   | IfStmt of {
       guard: expr;
       then_branch: statement list;

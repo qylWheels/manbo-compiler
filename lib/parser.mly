@@ -89,6 +89,9 @@ statement:
 				statements = Option.value stmts ~default:[];
 			}
 		}
+	| KEYWORD_RETURN; e = option(expression); SEMICOLON {
+			RetStmt (Option.value e ~default:(Unit : expr))
+		}
 	| KEYWORD_IF; e = expression; LBRACE;
 		then_branch = option(statements)
 		RBRACE; KEYWORD_ELSE; LBRACE;
