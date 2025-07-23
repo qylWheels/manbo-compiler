@@ -21,6 +21,10 @@ type identifier = Identifier of string [@@deriving show]
 and typ =
   Unit
   | Type of string
+  | FnType of {
+      params: typ list;
+      return: typ;
+    }
   [@@deriving show]
 
 (* 表达式 *)
