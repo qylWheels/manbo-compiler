@@ -21,7 +21,7 @@ type identifier = Identifier of string [@@deriving show]
 and typ =
   Unit
   | Type of string
-  [@@derviing show]
+  [@@deriving show]
 
 (* 表达式 *)
 type expr =
