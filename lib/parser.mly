@@ -165,5 +165,15 @@ fn_ret_type:
 typ:
 	| LPAREN; RPAREN { Unit : typ }
 	| w = WORD { Type w }
+	| KEYWORD_FN; LPAREN; params = fn_param_types; RPAREN; COLON; return = typ {
+		FnType { params; return }
+	}
+
+fn_param_types:
+	| fpt = fn_param_type; option(COMMA) { [fpt] }
+	| first = fn_param_type; COMMA; rest = fn_param_types { first :: rest }
+
+fn_param_type:
+	| t = typ { t }
 
 %%
