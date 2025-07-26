@@ -146,8 +146,8 @@ call_args:
 	| first = expression; COMMA; rest = call_args { first :: rest }
 
 qualifier:
-	| KEYWORD_VAR { `Var }
-	| KEYWORD_CONST { `Const }
+	| KEYWORD_VAR { Var }
+	| KEYWORD_CONST { Const }
 
 ident:
 	| w = WORD { Identifier w : identifier }
