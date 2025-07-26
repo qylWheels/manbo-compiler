@@ -14,6 +14,9 @@ and binop =
   | Assign (* 赋值运算符 *)
   [@@deriving show]
 
+(* 限定符 *)
+type qualifier = Const | Var [@@deriving show]
+
 (* 标识符 *)
 type identifier = Identifier of string [@@deriving show]
 
@@ -43,7 +46,7 @@ type expr =
 (* 语句 *)
 and statement =
   DefStmt of {
-    qualifier: [`Var | `Const];
+    qualifier: qualifier;
     lhs: identifier;
     rhs: expr;
   }
