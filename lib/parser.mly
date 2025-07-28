@@ -160,13 +160,16 @@ fn_param:
 	| id = ident; COLON; ty = typ { (id, ty) }
 
 fn_ret_type:
-	| COLON; ty = typ { ty }
+	| MINUS; R_ANGLE_BRACKET ; ty = typ { ty }
 
 typ:
 	| LPAREN; RPAREN { Unit : typ }
 	| w = WORD { Type w }
-	| KEYWORD_FN; LPAREN; params = fn_param_types; RPAREN; COLON; return = typ {
-		FnType { params; return }
+	| KEYWORD_FN; LPAREN; params = option(fn_param_types); RPAREN; return = option(fn_ret_type) {
+		FnType {
+			params = Option.value params ~default:[];
+			return = Option.value return ~default:(Unit : typ)
+		}
 	}
 
 fn_param_types:
