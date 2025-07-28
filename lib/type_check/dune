@@ -1,0 +1,6 @@
+(library
+ (name type_check)
+ (modules sym_table check)
+ (libraries manbo_compiler ppx_deriving.show)
+ (preprocess
+  (pps ppx_deriving.show)))
