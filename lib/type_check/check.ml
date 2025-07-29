@@ -1,4 +1,4 @@
-open Manbo_compiler.Ast
+open Frontend.Ast
 open Sym_table
 
 exception Type_error of string

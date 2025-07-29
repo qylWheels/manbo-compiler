@@ -1,11 +1,2 @@
-(ocamllex lexer)
-
-(menhir
- (modules parser))
-
 (library
- (name manbo_compiler)
- (modules lexer parser ast)
- (libraries menhirLib ppx_deriving.show)
- (preprocess
-  (pps ppx_deriving.show)))
+ (name manbo_compiler))

@@ -1,0 +1,11 @@
+(ocamllex lexer)
+
+(menhir
+ (modules parser))
+
+(library
+ (name frontend)
+ (modules lexer parser ast)
+ (libraries manbo_compiler ppx_deriving.show)
+ (preprocess
+  (pps ppx_deriving.show)))

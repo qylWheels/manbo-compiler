@@ -1,4 +1,4 @@
-open Manbo_compiler.Ast
+open Frontend.Ast
 
 type sym_table = {
   parent_scope : sym_table option;
