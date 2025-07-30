@@ -20,6 +20,16 @@ let rec type_equal (ty1 : typ) (ty2 : typ) : bool =
   match (ty1, ty2) with
   | Unit, Unit -> true
   | Type a, Type b when a = b -> true
+  | TupleType a, TupleType b ->
+      let rec equal alist blist =
+        if List.length alist <> List.length blist
+          then false
+          else match alist, blist with
+            | [], [] -> true
+            | (ha :: ta), (hb :: tb) -> type_equal ha hb && equal ta tb
+            | _, _ -> raise Unreachable
+      in
+      equal a b
   | FnType { params = p1; return = r1 }, FnType { params = p2; return = r2 } ->
       let result = List.equal type_equal p1 p2 && type_equal r1 r2 in
       result
@@ -33,10 +43,15 @@ let rec check_expression (expr : expr) (vsymtbl : sym_table)
   | Integer _ -> Type "Integer"
   | Float _ -> Type "Float"
   | String _ -> Type "String"
+  | Tuple e_list -> check_tuple_expression e_list vsymtbl fsymtbl
   | Identifier id -> check_id_expression id vsymtbl fsymtbl
   | UnaryExpr (op, e) -> check_unary_expression op e vsymtbl fsymtbl
   | BinExpr (l, op, r) -> check_bin_expression l op r vsymtbl fsymtbl
   | CallExpr (id, params) -> check_call_expression id params vsymtbl fsymtbl
+
+and check_tuple_expression e_list vsymtbl fsymtbl : typ =
+  let e_types = List.map (fun e -> check_expression e vsymtbl fsymtbl) e_list in
+  TupleType e_types
 
 (* 推断标识符id的类型，先在变量符号表中找，再在函数符号表中找 *)
 and check_id_expression id vsymtbl fsymtbl : typ =

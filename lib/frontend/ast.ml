@@ -24,6 +24,7 @@ type identifier = Identifier of string [@@deriving show]
 and typ =
   Unit
   | Type of string
+  | TupleType of typ list
   | FnType of {
       params: typ list;
       return: typ;
@@ -36,6 +37,7 @@ type expr =
   | Integer of int
   | Float of float
   | String of string
+  | Tuple of expr list
   | Identifier of identifier
   | UnaryExpr of unaryop * expr
   | BinExpr of expr * binop * expr

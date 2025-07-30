@@ -109,6 +109,7 @@ statement:
 
 expression:
 	| LPAREN; RPAREN { Unit }
+	| LPAREN; elems = tuple_elems; RPAREN { Tuple elems }
 	| i = INT_LITERAL { Integer i }
 	| f = FLOAT_LITERAL { Float f }
 	| s = STRING_LITERAL { String s }
@@ -141,6 +142,10 @@ expression:
 			CallExpr (id, Option.value args ~default:[])
 		}
 
+tuple_elems:
+	| e = expression; option(COMMA) { [e] }
+	| first = expression; COMMA; rest = tuple_elems { first :: rest }
+
 call_args:
 	| e = expression; option(COMMA) { [e] }
 	| first = expression; COMMA; rest = call_args { first :: rest }
@@ -164,6 +169,7 @@ fn_ret_type:
 
 typ:
 	| LPAREN; RPAREN { Unit : typ }
+	| LPAREN; elem_tys = tuple_elem_tys; RPAREN; { TupleType elem_tys }
 	| w = WORD { Type w }
 	| KEYWORD_FN; LPAREN; params = option(fn_param_types); RPAREN; return = option(fn_ret_type) {
 		FnType {
@@ -171,6 +177,10 @@ typ:
 			return = Option.value return ~default:(Unit : typ)
 		}
 	}
+
+tuple_elem_tys:
+	| ty = typ; option(COMMA) { [ty] }
+	| first = typ; option(COMMA); rest = tuple_elem_tys { first :: rest }
 
 fn_param_types:
 	| fpt = fn_param_type; option(COMMA) { [fpt] }
