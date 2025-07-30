@@ -1,11 +1,25 @@
 (ocamllex lexer)
 
+; TODO: 为什么用menhir命令不行，要用rules命令？
+; (menhir
+;  (modules tokens)
+;  (flags --only-tokens)
+; )
+(rule
+ (targets tokens.ml tokens.mli)
+ (deps tokens.mly)
+ ;; 使用 --only-tokens 选项
+ (action (run menhir --only-tokens %{deps}))
+)
+
 (menhir
- (modules parser))
+ (modules tokens common type expression statement parser)
+ (merge_into parser)
+ (flags --external-tokens Tokens))
 
 (library
  (name frontend)
- (modules lexer parser ast)
+ (modules lexer tokens parser ast)
  (libraries manbo_compiler ppx_deriving.show)
  (preprocess
   (pps ppx_deriving.show)))

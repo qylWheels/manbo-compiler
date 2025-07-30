@@ -1,5 +1,5 @@
 {
-  open Parser
+  open Tokens
 	exception Lexer_error of string
 }
 
