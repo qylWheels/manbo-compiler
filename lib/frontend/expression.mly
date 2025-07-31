@@ -35,6 +35,9 @@
 			CallExpr (id, Option.value args ~default:[])
 		}
 
+	(* 元组取下标表达式 *)
+	| e = expression; DOT; i = INT_LITERAL { TupleIndexing (e, i) }
+
 tuple_elems:
 	| e = expression; option(COMMA) { [e] }
 	| first = expression; COMMA; rest = tuple_elems { first :: rest }

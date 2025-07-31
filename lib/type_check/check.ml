@@ -44,6 +44,7 @@ let rec check_expression (expr : expr) (vsymtbl : sym_table)
   | Float _ -> Type "Float"
   | String _ -> Type "String"
   | Tuple e_list -> check_tuple_expression e_list vsymtbl fsymtbl
+  | TupleIndexing (e, i) -> check_tuple_indexing_expression e i vsymtbl fsymtbl
   | Identifier id -> check_id_expression id vsymtbl fsymtbl
   | UnaryExpr (op, e) -> check_unary_expression op e vsymtbl fsymtbl
   | BinExpr (l, op, r) -> check_bin_expression l op r vsymtbl fsymtbl
@@ -52,6 +53,15 @@ let rec check_expression (expr : expr) (vsymtbl : sym_table)
 and check_tuple_expression e_list vsymtbl fsymtbl : typ =
   let e_types = List.map (fun e -> check_expression e vsymtbl fsymtbl) e_list in
   TupleType e_types
+
+and check_tuple_indexing_expression e i vsymtbl fsymtbl : typ =
+  let e_ty = check_expression e vsymtbl fsymtbl in
+  match e_ty with
+  | TupleType l ->
+      let len = List.length l in
+      if i < len then List.nth l i
+      else raise (Type_error "Index exceeds tuple length")
+  | ty -> raise (Type_error (Printf.sprintf "Expected type Tuple, found %s" (show_typ ty)))
 
 (* 推断标识符id的类型，先在变量符号表中找，再在函数符号表中找 *)
 and check_id_expression id vsymtbl fsymtbl : typ =

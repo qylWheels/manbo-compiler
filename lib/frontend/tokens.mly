@@ -31,6 +31,7 @@
 %token SEMICOLON
 %token COLON
 %token COMMA
+%token DOT
 %token LPAREN
 %token RPAREN
 %token LBRACKET

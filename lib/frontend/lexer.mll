@@ -50,6 +50,7 @@ rule token = parse
   | ';' { SEMICOLON }
   | ':' { COLON }
   | ',' { COMMA }
+  | '.' { DOT }
   | '(' { LPAREN }
   | ')' { RPAREN }
   | '[' { LBRACKET }

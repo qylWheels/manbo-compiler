@@ -38,6 +38,7 @@ type expr =
   | Float of float
   | String of string
   | Tuple of expr list
+  | TupleIndexing of expr * int
   | Identifier of identifier
   | UnaryExpr of unaryop * expr
   | BinExpr of expr * binop * expr
