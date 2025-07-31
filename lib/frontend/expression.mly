@@ -2,11 +2,14 @@
 
 %public expression:
 	| LPAREN; RPAREN { Unit }
-	| LPAREN; elems = tuple_elems; RPAREN { Tuple elems }
 	| i = INT_LITERAL { Integer i }
 	| f = FLOAT_LITERAL { Float f }
 	| s = STRING_LITERAL { String s }
 	| id = ident { Identifier id }
+
+	| LPAREN; e = expression; COMMA; es = tuple_elems?; RPAREN {
+			Tuple (e :: (Option.value es ~default:[]))
+		}
 
 	(* 括号表达式 *)
 	| LPAREN; e = expression; RPAREN { e }
