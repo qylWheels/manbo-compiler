@@ -13,7 +13,7 @@
 )
 
 (menhir
- (modules tokens common type expression statement parser)
+ (modules tokens common type expression statement item parser)
  (merge_into parser)
  (flags --external-tokens Tokens))
 

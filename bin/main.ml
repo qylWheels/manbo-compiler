@@ -1,5 +1,5 @@
-open Manbo_compiler
 open Type_check
+open Frontend
 
 let parse_file filename =
   let chan = open_in filename in
@@ -10,7 +10,8 @@ let parse_file filename =
 
 let () =
   let prog = parse_file "test/manbo/test.manbo" in
-  let (vsymtbl, fsymtbl) = prog |> Check.check_prog in
+  let vsymtbl, fsymtbl = prog |> Check.check_prog in
+  print_endline "========== vsymtbl ==========";
   Sym_table.print vsymtbl 0;
+  print_endline "========== fsymtbl ==========";
   Sym_table.print fsymtbl 0
-  

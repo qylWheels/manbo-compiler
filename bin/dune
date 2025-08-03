@@ -1,4 +1,5 @@
 (executable
  (public_name manbo-compiler)
  (name main)
+ (modes byte exe)
  (libraries manbo_compiler type_check))

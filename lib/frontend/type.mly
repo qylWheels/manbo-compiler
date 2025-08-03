@@ -1,13 +1,13 @@
 %%
 
 %public typ:
-	| LPAREN; RPAREN { Unit : typ }
+	| LPAREN; RPAREN { UnitType }
 	| LPAREN; elem_tys = tuple_elem_tys; RPAREN; { TupleType elem_tys }
 	| w = WORD { Type w }
 	| KEYWORD_FN; LPAREN; params = option(fn_param_types); RPAREN; return = option(fn_ret_type) {
 		FnType {
 			params = Option.value params ~default:[];
-			return = Option.value return ~default:(Unit : typ)
+			return = Option.value return ~default:(UnitType)
 		}
 	}
 
@@ -22,6 +22,5 @@ fn_param_types:
 fn_param_type:
 	| t = typ { t }
 
-%public fn_ret_type:
+fn_ret_type:
 	| MINUS; R_ANGLE_BRACKET ; ty = typ { ty }
-	

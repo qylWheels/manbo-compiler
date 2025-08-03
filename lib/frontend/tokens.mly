@@ -6,6 +6,7 @@
 %token KEYWORD_IF
 %token KEYWORD_ELSE
 %token KEYWORD_WHILE
+%token KEYWORD_STRUCT
 
 (* 字面量 *)
 %token <int> INT_LITERAL

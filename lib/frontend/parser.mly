@@ -7,6 +7,6 @@
 %%
 
 prog:
-	| stmts = statements; EOF { Prog stmts }
+	| items = list(item); EOF { items }
 
 %%

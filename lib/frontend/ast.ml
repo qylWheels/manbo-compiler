@@ -22,12 +22,16 @@ type identifier = Identifier of string [@@deriving show]
 
 (* 类型 *)
 and typ =
-  Unit
+  UnitType
   | Type of string
   | TupleType of typ list
   | FnType of {
       params: typ list;
       return: typ;
+    }
+  | StructType of {
+      ident: identifier;
+      fields: (identifier * typ) list;
     }
   [@@deriving show]
 
@@ -61,12 +65,6 @@ and statement =
       condition: expr;
       statements: statement list;
     }
-  | FnStmt of {
-      ident: identifier;
-      params: (identifier * typ) list;
-      return: typ;
-      statements: statement list;
-    }
   | RetStmt of expr
   | IfStmt of {
       guard: expr;
@@ -75,5 +73,25 @@ and statement =
     }
   [@@deriving show]
 
+type item = 
+  | StmtItem of statement
+  | FnItem of fn_item
+  | StructItem of struct_item
+[@@deriving show]
+
+and fn_item = {
+  ident: identifier;
+  params: (identifier * typ) list;
+  return: typ;
+  statements: statement list;
+}
+[@@deriving show]
+
+and struct_item = {
+  ident: identifier;
+  fields: (identifier * typ) list;
+}
+[@@deriving show]
+
 (* 整个程序 *)
-type prog = Prog of statement list [@@deriving show]
+type prog = item list [@@deriving show]

@@ -1,6 +1,6 @@
 (library
  (name type_check)
- (modules sym_table check)
+ (modules sym_table type_table check)
  (libraries frontend ppx_deriving.show)
  (preprocess
   (pps ppx_deriving.show)))

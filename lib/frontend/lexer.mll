@@ -25,6 +25,7 @@ rule token = parse
   | "if" { KEYWORD_IF }
   | "else" { KEYWORD_ELSE }
   | "while" { KEYWORD_WHILE }
+  | "struct" { KEYWORD_STRUCT }
 
   (* 字面量 *)
   | int_literal as i { INT_LITERAL (int_of_string i) }
