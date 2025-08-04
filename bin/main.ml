@@ -1,5 +1,5 @@
-open Type_check
 open Frontend
+open Semantic
 
 let parse_file filename =
   let chan = open_in filename in

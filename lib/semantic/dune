@@ -1,5 +1,5 @@
 (library
- (name type_check)
+ (name semantic)
  (modules sym_table type_table check)
  (libraries frontend ppx_deriving.show)
  (preprocess
