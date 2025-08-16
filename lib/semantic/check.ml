@@ -423,9 +423,6 @@ let check_prog (prog : prog) : sym_table * sym_table  =
     Type_table.add tytbl (Type "String") (Type "String")
   in
 
-  let _ = print_endline "tytbl ===========" in
-  let _ = print_endline (Type_table.show_type_table tytbl) in
-
   (* 第二轮遍历AST，对所有项目进行类型检查 *)
   let _ = check_items items vsymtbl fsymtbl tytbl in
 
