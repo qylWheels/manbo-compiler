@@ -23,4 +23,4 @@ fn_param_type:
 	| t = typ { t }
 
 fn_ret_type:
-	| MINUS; R_ANGLE_BRACKET ; ty = typ { ty }
+	| ty = typ { ty }
