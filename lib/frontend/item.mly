@@ -35,4 +35,4 @@ fn_param:
 	| id = ident; COLON; ty = typ { (id, ty) }
 
 fn_ret:
-	| MINUS; R_ANGLE_BRACKET ; ty = typ { ty }
+	| ty = typ { ty }
