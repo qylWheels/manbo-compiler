@@ -1,5 +1,6 @@
 open Frontend.Ast
 open Sym_table
+open Type_table
 
 exception Type_error of string
 exception Undefined_error of string
@@ -408,13 +409,14 @@ and build_struct_item item _fsymtbl tytbl : unit =
   Type_table.add tytbl (Type struct_name) struct_ty
 
 (* 检查整个程序，返回变量符号表、函数符号表和类型环境表 *)
-let check_prog (prog : prog) : sym_table * sym_table  =
+let check_prog (prog : prog) : sym_table * sym_table * type_table  =
   let vsymtbl = Sym_table.create () in
   let fsymtbl = Sym_table.create () in
   let tytbl = Type_table.create () in
   let items = prog in
 
-  (* 第一轮遍历AST，将函数、结构体、枚举类型加入对应的表中，构建类型环境 *)
+  (* 第一轮遍历AST，将函数、结构体、枚举类型加入对应的表中，构建类型环境， *)
+  (* 以支持递归和先使用后定义 *)
   let _ = build_env items fsymtbl tytbl in
   (* 将Integer、Float、String等默认类型加入tytbl *)
   let _ =
@@ -426,4 +428,4 @@ let check_prog (prog : prog) : sym_table * sym_table  =
   (* 第二轮遍历AST，对所有项目进行类型检查 *)
   let _ = check_items items vsymtbl fsymtbl tytbl in
 
-  (vsymtbl, fsymtbl)
+  (vsymtbl, fsymtbl, tytbl)

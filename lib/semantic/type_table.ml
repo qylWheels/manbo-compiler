@@ -32,3 +32,6 @@ let find_opt table alias : typ option =
   match map with
   | None -> None
   | Some { alias = _; ty = ty } -> Some ty *)
+
+let print table =
+  table |> show_type_table |> print_endline
