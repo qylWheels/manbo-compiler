@@ -354,10 +354,24 @@ and check_fn_item f vsymtbl fsymtbl tytbl : unit =
       (Type_error (Printf.sprintf "No return statement in function %s" fn_name))
   else ()
 
+(* FIXME: struct中不能有同名字段 *)
 and check_struct_item s tytbl : unit =
-  let field_tys = List.map (fun (_, ty) -> ty) s.fields in
+  (* 检查是否有重复字段名 *)
+  let tbl = Hashtbl.create 16 in
+  let rec check_dup_field l = match l with
+    | [] -> ()
+    | (id, _) :: t ->
+        let has = Hashtbl.find_opt tbl id in
+        if has = None
+          then
+            let _ = Hashtbl.add tbl id () in
+            check_dup_field t
+          else raise (Redefined_error (Printf.sprintf "field %s is redefined" (show_identifier id)))
+  in
+  check_dup_field s.fields;
 
   (* 只有Type "xxx"形式的类型需要检查 *)
+  let field_tys = List.map (fun (_, ty) -> ty) s.fields in
   let filtered_field_tys = List.filter
     (fun ty -> match ty with
       | Type _ -> true
