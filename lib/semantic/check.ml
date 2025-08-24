@@ -115,8 +115,8 @@ and check_bin_expression l op r vsymtbl fsymtbl tytbl : typ =
                   (show_typ l) (show_typ r))))
   | Equal | NotEq -> (
       match (l_ty, r_ty) with
-      | Type "Integer", Type "Integer" -> Type "Integer"
-      | Type "Float", Type "Float" -> Type "Float"
+      | Type "Integer", Type "Integer" -> Type "Bool"
+      | Type "Float", Type "Float" -> Type "Bool"
       | l, r ->
           raise
             (Type_error
