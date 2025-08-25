@@ -192,18 +192,14 @@ and gen_identifier id scope =
       | None -> raise Unreachable)
 
 and gen_unary_expression uop e scope =
+  let open Llvm_irgen_builtins in
   let e_v = gen_expression e scope in
-  (* 如果是指针，就要读取指针指向的值 *)
-  let e_actual_v = match e_v |> type_of |> classify_type with
-    | Pointer -> Helper.load_from_ptr e_v builder
-    | _ -> e_v
-  in
   match uop with
-  | Minus -> (
-      match e_actual_v |> type_of |> classify_type with
-      | Integer -> build_neg e_actual_v "" builder
-      | Double -> build_fneg e_actual_v "" builder
-      | _ -> raise Unreachable)
+  | Minus ->
+      build_call
+        (Unary_op.__manbo_unary_minus_type global_context)
+        (lookup_function "__manbo_unary_minus" the_module |> Option.get)
+        [|e_v|] "" builder
   | LogicalNot -> raise Unimplemented
 
 and gen_bin_expression l bop r scope =
@@ -447,7 +443,8 @@ let build_builtin_env llctx llmod =
   ignore (Float.__manbo_float_alloc_decl llctx llmod);
   ignore (String.__manbo_string_alloc_decl llctx llmod);
   ignore (Tuple.__manbo_tuple_alloc_decl llctx llmod);
-  ignore (Tuple.__manbo_tuple_indexing_decl llctx llmod)
+  ignore (Tuple.__manbo_tuple_indexing_decl llctx llmod);
+  ignore (Unary_op.__manbo_unary_minus_decl llctx llmod)
 
 let rec gen_prog prog tytbl =
   (* 初始化上下文 *)
