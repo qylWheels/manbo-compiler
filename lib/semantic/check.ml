@@ -16,6 +16,9 @@ exception Unimplemented
 *)
 let active_fn_stack = Stack.create ()
 
+(* 内置类型 *)
+let builtin_types = ["Integer"; "Float"; "String"]
+
 (* 比较两个类型是否相同 *)
 let rec type_equal (ty1 : typ) (ty2 : typ) : bool =
   match (ty1, ty2) with
@@ -300,7 +303,7 @@ and check_item item vsymtbl fsymtbl tytbl : unit =
 and check_fn_item f vsymtbl fsymtbl tytbl : unit =
   let { ident; params; return = _; statements = stmts } = f in
 
-  (* 检查函数是否已定义 *)
+  (* 检查函数是否重定义 *)
   let fn_ty = match find_symbol fsymtbl ident with
     | None -> raise (Undefined_error (Printf.sprintf "Function \"%s\" is undefined" (show_identifier ident)))
     | Some (_, ty) -> ty
