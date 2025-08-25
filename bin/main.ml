@@ -18,7 +18,7 @@ let () =
   Logs.info (fun m -> m "Parsing");
   let prog = parse_file "test/manbo/test.manbo" in
 
-  Logs.info (fun m -> m "Type checking");
+  Logs.info (fun m -> m "Semantic checking");
   let _vsymtbl, _fsymtbl, tytbl = prog |> Check.check_prog in
 
   Logs.info (fun m -> m "Generating LLVM IR");
