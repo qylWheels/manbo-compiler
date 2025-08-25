@@ -2,4 +2,4 @@
  (public_name manbo-compiler)
  (name main)
  (modes byte exe)
- (libraries frontend semantic))
+ (libraries frontend semantic llvm_ir_generator logs logs.fmt))

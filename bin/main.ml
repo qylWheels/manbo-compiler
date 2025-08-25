@@ -1,6 +1,8 @@
 open Frontend
 open Semantic
+open Llvm_ir_generator
 
+(* 词法和语法分析 *)
 let parse_file filename =
   let chan = open_in filename in
   let lexbuf = Lexing.from_channel chan in
@@ -9,9 +11,17 @@ let parse_file filename =
   result
 
 let () =
+  (* 配置logger *)
+  Logs.set_level (Some Logs.Info);
+  Logs.set_reporter (Logs_fmt.reporter ());
+  
+  Logs.info (fun m -> m "Parsing");
   let prog = parse_file "test/manbo/test.manbo" in
-  let vsymtbl, fsymtbl = prog |> Check.check_prog in
-  print_endline "========== vsymtbl ==========";
-  Sym_table.print vsymtbl 0;
-  print_endline "========== fsymtbl ==========";
-  Sym_table.print fsymtbl 0
+
+  Logs.info (fun m -> m "Type checking");
+  let _vsymtbl, _fsymtbl, tytbl = prog |> Check.check_prog in
+
+  Logs.info (fun m -> m "Generating LLVM IR");
+  let _ = Irgen.gen_prog prog tytbl in
+  Irgen.dump ()
+
