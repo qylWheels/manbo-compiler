@@ -1,4 +1,4 @@
 (library
  (name llvm_irgen_builtins)
- (modules integer float string)
+ (modules integer float string tuple)
  (libraries llvm))

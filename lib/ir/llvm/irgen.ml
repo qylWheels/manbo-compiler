@@ -159,38 +159,30 @@ and gen_string s =
   v
 
 and gen_tuple tuple scope =
-  (* 确定元组的llvm类型 *)
-  let elems =
-    match tuple with
-    | Tuple t -> List.map (fun expr -> gen_expression expr scope) t
+  let open Llvm_irgen_builtins in
+  let exprs = match tuple with
+    | Tuple t -> t
     | _ -> raise Unreachable
   in
-  let elem_llvm_tys = List.map (fun elem -> type_of elem) elems in
-  let tuple_llvm_ty = struct_type global_context (Array.of_list elem_llvm_tys) in
-
-  (* 在栈上分配元组内存空间 *)
-  let ptr = build_alloca tuple_llvm_ty "" builder in
-
-  (* 存储元组内容 *)
-  let rec store elems ptr i =
-    match elems with
-    | [] -> ()
-    | h :: t ->
-        let field_ptr =
-          build_struct_gep tuple_llvm_ty ptr i "" builder
-        in
-        let _ = build_store h field_ptr builder in
-        store t ptr (i + 1)
+  let v = build_call
+    (Tuple.__manbo_tuple_alloc_type global_context)
+    (lookup_function "__manbo_tuple_alloc" the_module |> Option.get)
+    (List.map (fun e -> gen_expression e scope) exprs |> Array.of_list)
+    ""
+    builder
   in
-  let _ = store elems ptr 0 in
-  build_load tuple_llvm_ty ptr "" builder
+  v
 
 and gen_tuple_indexing e i scope =
-  (* 对元组表达式求值 *)
-  let t = gen_expression e scope in
-
-  (* 提取指定下标的内容 *)
-  build_extractvalue t i "" builder
+  let open Llvm_irgen_builtins in
+  let tuple = gen_expression e scope in
+  let index = gen_integer i in
+  let v = build_call
+    (Tuple.__manbo_tuple_indexing_type global_context)
+    (lookup_function "__manbo_tuple_indexing" the_module |> Option.get)
+    [|tuple; index|] "" builder
+  in
+  v
 
 and gen_identifier id scope =
   try Scope.id_to_llvalue scope id with
@@ -453,7 +445,9 @@ let build_builtin_env llctx llmod =
   let open Llvm_irgen_builtins in
   ignore (Integer.__manbo_integer_alloc_decl llctx llmod);
   ignore (Float.__manbo_float_alloc_decl llctx llmod);
-  ignore (String.__manbo_string_alloc_decl llctx llmod)
+  ignore (String.__manbo_string_alloc_decl llctx llmod);
+  ignore (Tuple.__manbo_tuple_alloc_decl llctx llmod);
+  ignore (Tuple.__manbo_tuple_indexing_decl llctx llmod)
 
 let rec gen_prog prog tytbl =
   (* 初始化上下文 *)
