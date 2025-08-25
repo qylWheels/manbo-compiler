@@ -132,9 +132,31 @@ let rec gen_expression expr scope =
   | BinExpr (l, op, r) -> gen_bin_expression l op r scope
   | CallExpr (id, params) -> gen_call_expression id params scope
 
-and gen_integer i = const_int (i64_type global_context) i
-and gen_float f = const_float (double_type global_context) f
-and gen_string s = const_string global_context s
+and gen_integer i =
+  let open Llvm_irgen_builtins in
+  let v = build_call
+    (Integer.__manbo_integer_alloc_type global_context)
+    (lookup_function "__manbo_integer_alloc" the_module |> Option.get)
+    [|const_int (i64_type global_context) i|] "" builder
+  in
+  v
+
+and gen_float f =
+  let open Llvm_irgen_builtins in
+  let v = build_call
+    (Float.__manbo_float_alloc_type global_context)
+    (lookup_function "__manbo_float_alloc" the_module |> Option.get)
+    [|const_float (double_type global_context) f|] "" builder
+  in
+  v
+
+and gen_string s =
+  let v = build_call
+    (Llvm_irgen_builtins.String.__manbo_string_alloc_type global_context)
+    (lookup_function "__manbo_string_alloc" the_module |> Option.get)
+    [|const_string global_context s|] "" builder
+  in
+  v
 
 and gen_tuple tuple scope =
   (* 确定元组的llvm类型 *)
@@ -240,11 +262,6 @@ and gen_call_expression id params scope =
   (* 查找函数定义 *)
   let name = ident_to_str id in
   let f = lookup_function name the_module |> Option.get in
-
-  (* DEBUG: 打印函数 *)
-  dump_value f;
-  (* DEBUG: 打印参数 *)
-  List.iter (fun v -> dump_value v) (List.map (fun e -> gen_expression e scope) params);
 
   (* 构建函数调用指令 *)
   build_call (type_of f) f
@@ -432,15 +449,28 @@ and build_fn_type_env f scope =
   let fn_llvm_ty = function_type ret_llvm_ty (Array.of_list param_llvm_tys) in 
   ignore (define_function fn_name fn_llvm_ty the_module)
 
+let build_builtin_env llctx llmod =
+  let open Llvm_irgen_builtins in
+  ignore (Integer.__manbo_integer_alloc_decl llctx llmod);
+  ignore (Float.__manbo_float_alloc_decl llctx llmod);
+  ignore (String.__manbo_string_alloc_decl llctx llmod)
+
 let rec gen_prog prog tytbl =
   (* 初始化上下文 *)
   let scope = Scope.init tytbl in
   
-  (* 生成顶层函数 *)
-  let _ = gen_top_fn () in
+  (* 构建内置函数环境 *)
+  build_builtin_env global_context the_module;
   
-  (* 构建类型和函数上下文 *)
+  (* 构建类型、函数环境 *)
   build_env prog scope;
+
+  (* 生成顶层函数 *)
+  let entry_fn = gen_top_fn () in
+
+  (* 将builder指向顶层函数的入口块 *)
+  let entry_bb = entry_block entry_fn in
+  position_at_end entry_bb builder; 
   
   (* 生成IR。这里传入的上下文是顶层上下文，对应llvm全局作用域 *)
   gen_items prog scope;
@@ -448,7 +478,7 @@ let rec gen_prog prog tytbl =
 and gen_top_fn () =
   let entry_fn_ty = function_type (void_type global_context) [||] in
   let entry_fn = define_function entry_fn_name entry_fn_ty the_module in
-  let _ = Stack.push entry_fn_name fn_stack in
+  Stack.push entry_fn_name fn_stack;
   entry_fn
 
 (* 调试用：打印生成的IR *)

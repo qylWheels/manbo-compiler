@@ -1,0 +1,4 @@
+(library
+ (name llvm_irgen_builtins)
+ (modules integer float string)
+ (libraries llvm))

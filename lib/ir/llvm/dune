@@ -1,4 +1,4 @@
 (library
  (name llvm_ir_generator)
  (modules irgen helper)
- (libraries frontend semantic llvm))
+ (libraries frontend semantic llvm llvm_irgen_builtins))
