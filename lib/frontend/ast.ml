@@ -7,6 +7,7 @@ type unaryop =
   Minus | LogicalNot [@@deriving show]
 
 (* 二元运算符 *)
+(* FIXME: 将求余运算符改名叫Rem *)
 and binop =
   Add | Sub | Mul | Div | Mod (* 算术运算符 *)
   | Less | Le | Equal | Ge | Greater | NotEq (* 比较运算符 *)

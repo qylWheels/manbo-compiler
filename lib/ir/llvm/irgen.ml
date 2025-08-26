@@ -203,46 +203,32 @@ and gen_unary_expression uop e scope =
   | LogicalNot -> raise Unimplemented
 
 and gen_bin_expression l bop r scope =
-  let open Helper in
+  let open Llvm_irgen_builtins.Binary_op in
 
   let l_v = gen_expression l scope in
   let r_v = gen_expression r scope in
 
-  (* 将指针类型中的整数/浮点数类型读取出来 *)
-  let l_actual_v = match l_v |> type_of |> classify_type with
-    | Pointer -> load_from_ptr l_v builder
-    | _ -> l_v
-  in
-  let r_actual_v = match r_v |> type_of |> classify_type with
-    | Pointer -> load_from_ptr r_v builder
-    | _ -> r_v
+  let simple_build_call ty name =
+    build_call
+      (ty global_context)
+      (lookup_function name the_module |> Option.get)
+      [|l_v; r_v|] "" builder
   in
 
-  match (bop, l_actual_v |> type_of |> classify_type) with
+  match bop with
   (* 算数运算符 *)
-  | Add, Integer -> build_add l_actual_v r_actual_v "" builder
-  | Add, Double -> build_fadd l_actual_v r_actual_v "" builder
-  | Sub, Integer -> build_sub l_actual_v r_actual_v "" builder
-  | Sub, Double -> build_fsub l_actual_v r_actual_v "" builder
-  | Mul, Integer -> build_mul l_actual_v r_actual_v "" builder
-  | Mul, Double -> build_fmul l_actual_v r_actual_v "" builder
-  | Div, Integer -> build_sdiv l_actual_v r_actual_v "" builder
-  | Div, Double -> build_fdiv l_actual_v r_actual_v "" builder
-  | Mod, Integer -> build_srem l_actual_v r_actual_v "" builder
-  | Mod, Double -> build_frem l_actual_v r_actual_v "" builder
+  | Add -> simple_build_call (__manbo_binary_add_type) "__manbo_binary_add"
+  | Sub -> simple_build_call (__manbo_binary_sub_type) "__manbo_binary_sub"
+  | Mul -> simple_build_call (__manbo_binary_mul_type) "__manbo_binary_mul"
+  | Div -> simple_build_call (__manbo_binary_div_type) "__manbo_binary_div"
+  | Mod -> simple_build_call (__manbo_binary_rem_type) "__manbo_binary_rem"
   (* 比较运算符 *)
-  | Less, Integer -> build_icmp Slt l_actual_v r_actual_v "" builder
-  | Less, Double -> build_fcmp Olt l_actual_v r_actual_v "" builder
-  | Le, Integer -> build_icmp Sle l_actual_v r_actual_v "" builder
-  | Le, Double -> build_fcmp Ole l_actual_v r_actual_v "" builder
-  | Equal, Integer -> build_icmp Eq l_actual_v r_actual_v "" builder
-  | Equal, Double -> build_fcmp Oeq l_actual_v r_actual_v "" builder
-  | Ge, Integer -> build_icmp Sge l_actual_v r_actual_v "" builder
-  | Ge, Double -> build_fcmp Oge l_actual_v r_actual_v "" builder
-  | Greater, Integer -> build_icmp Sgt l_actual_v r_actual_v "" builder
-  | Greater, Double -> build_fcmp Ogt l_actual_v r_actual_v "" builder
-  | NotEq, Integer -> build_icmp Ne l_actual_v r_actual_v "" builder
-  | NotEq, Double -> build_fcmp One l_actual_v r_actual_v "" builder
+  | Less -> simple_build_call (__manbo_binary_less_type) "__manbo_binary_less"
+  | Le -> simple_build_call (__manbo_binary_le_type) "__manbo_binary_le"
+  | Equal -> simple_build_call (__manbo_binary_equal_type) "__manbo_binary_equal"
+  | Ge -> simple_build_call (__manbo_binary_ge_type) "__manbo_binary_ge"
+  | Greater -> simple_build_call (__manbo_binary_greater_type) "__manbo_binary_greater"
+  | NotEq -> simple_build_call (__manbo_binary_notequal_type) "__manbo_binary_notequal"
   (* TODO: 逻辑运算符 *)
   | _ -> raise Unimplemented
 
@@ -444,7 +430,18 @@ let build_builtin_env llctx llmod =
   ignore (String.__manbo_string_alloc_decl llctx llmod);
   ignore (Tuple.__manbo_tuple_alloc_decl llctx llmod);
   ignore (Tuple.__manbo_tuple_indexing_decl llctx llmod);
-  ignore (Unary_op.__manbo_unary_minus_decl llctx llmod)
+  ignore (Unary_op.__manbo_unary_minus_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_add_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_sub_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_mul_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_div_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_rem_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_less_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_le_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_equal_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_ge_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_greater_decl llctx llmod);
+  ignore (Binary_op.__manbo_binary_notequal_decl llctx llmod)
 
 let rec gen_prog prog tytbl =
   (* 初始化上下文 *)
